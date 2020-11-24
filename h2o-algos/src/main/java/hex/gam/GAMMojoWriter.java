@@ -51,7 +51,7 @@ public class GAMMojoWriter extends ModelMojoWriter<GAMModel, GAMModel.GAMParamet
       writekv("tweedie_link_power", model._parms._tweedie_link_power);
     // add GAM specific parameters
     writekv("num_knots", model._parms._num_knots); // an array
-    writeStringArrays(model._parms._gam_columns, "gam_columns"); // gam_columns specified by users
+    writeStringArrays(model._parms._gam_columns[0], "gam_columns"); // gam_columns specified by users
     int numGamLength = 0;
     int numGamCLength = 0;
     for (int cInd=0; cInd < numGamCols; cInd++)  { // only contains expanded gam column names not centered
@@ -76,9 +76,9 @@ public class GAMMojoWriter extends ModelMojoWriter<GAMModel, GAMModel.GAMParamet
       writekv("beta center length per class", model._output._model_beta.length);
     }
     writekv("bs", model._parms._bs);  // an array of choice of spline functions
-    writeDoubleArray(model._output._knots, "knots");
+    writeDoubleArray(model._output._knots[0], "knots"); // todo fix me
     int countGamCols = 0;
-    for (String gamCol : model._parms._gam_columns) {
+    for (String gamCol : model._parms._gam_columns[0]) {// todo fix
       writeDoubleArray(model._output._zTranspose[countGamCols], gamCol+"_zTranspose");      // write zTranspose
       writeDoubleArray(model._output._binvD[countGamCols++], gamCol+"_binvD");      // write binvD
     }

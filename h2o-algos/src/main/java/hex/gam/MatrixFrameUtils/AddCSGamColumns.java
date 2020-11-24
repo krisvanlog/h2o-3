@@ -14,9 +14,9 @@ import static hex.genmodel.algos.gam.GamUtilsCubicRegression.*;
  * Given a Frame, the class will add all the gam columns to the end of the Frame right before
  * the response column if it exists
  */
-public class AddGamColumns extends MRTask<AddGamColumns> {
+public class AddCSGamColumns extends MRTask<AddCSGamColumns> {
   double[][][] _binvD;
-  double[][] _knotsMat;
+  double[][][] _knotsMat;
   double[][][] _ztransp;
   int[] _numKnots;
   public int _numGAMcols;
@@ -27,12 +27,12 @@ public class AddGamColumns extends MRTask<AddGamColumns> {
   Frame _gamFrame;
 
 
-  public AddGamColumns(double[][][] binvD, double[][][] ztransp, double[][] knotsMat, int[] numKnots, 
-                       Frame gamColFrames) {
+  public AddCSGamColumns(double[][][] binvD, double[][][] ztransp, double[][][] knotsMat, int[] numKnots,
+                         Frame gamColFrames) {
     _binvD = binvD;
     _knotsMat = knotsMat;
     _numKnots = numKnots;
-    _numGAMcols = numKnots.length;
+    _numGAMcols = gamColFrames.numCols();
     _vmax = MemoryManager.malloc8d(_numGAMcols);
     _vmin = MemoryManager.malloc8d(_numGAMcols);
     _gamColsOffsets = MemoryManager.malloc4(_numGAMcols);
@@ -54,7 +54,7 @@ public class AddGamColumns extends MRTask<AddGamColumns> {
     double[][] basisVals = new double[_numGAMcols][];
     double[][] basisValsCenter = new double[_numGAMcols][];
     for (int gcolInd = 0; gcolInd < _numGAMcols; gcolInd++) { // prepare splines
-      crSplines[gcolInd] = new CubicRegressionSplines(_numKnots[gcolInd], _knotsMat[gcolInd]);
+      crSplines[gcolInd] = new CubicRegressionSplines(_numKnots[gcolInd], _knotsMat[gcolInd][0]);
       basisValsCenter[gcolInd] = MemoryManager.malloc8d(_numKnots[gcolInd]-1); // with centering, it is one less
       basisVals[gcolInd] = MemoryManager.malloc8d(_numKnots[gcolInd]); // without centering
     }
