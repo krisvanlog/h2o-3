@@ -45,7 +45,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("./smalldata/testng/airlines_train.csv");
+      final Frame trainingFrame = parseTestFile("./smalldata/testng/airlines_train.csv");
       Scope.track(trainingFrame);
 
       final Integer[] ntreesArr = new Integer[]{5, 50, 7, 8, 9, 10, 500};
@@ -85,7 +85,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("./smalldata/testng/airlines_train.csv");
+      final Frame trainingFrame = parseTestFile("./smalldata/testng/airlines_train.csv");
       Scope.track(trainingFrame);
 
       final Integer[] ntreesArr = new Integer[]{5, 50, 7, 8, 9, 10, 500};
@@ -128,7 +128,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("./smalldata/testng/airlines_train.csv");
+      final Frame trainingFrame = parseTestFile("./smalldata/testng/airlines_train.csv");
       Scope.track(trainingFrame);
 
       final Integer[] ntreesArr = new Integer[]{5, 50, 7, 8, 9, 10};
@@ -192,7 +192,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("./smalldata/testng/airlines_train.csv");
+      final Frame trainingFrame = parseTestFile("./smalldata/testng/airlines_train.csv");
       Scope.track(trainingFrame);
 
       final Integer[] ntreesArr = new Integer[]{5, 50, 7, 8, 9, 10};
@@ -223,7 +223,7 @@ public class GridTest extends TestUtil {
   public void testFaileH2OdParamsCleanup() {
     try {
       Scope.enter();
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       // Setup random hyperparameter search space
@@ -286,7 +286,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       HashMap<String, Object[]> hyperParms = new HashMap<String, Object[]>() {{
@@ -427,7 +427,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       HashMap<String, Object[]> hyperParms = new HashMap<String, Object[]>() {{
@@ -513,7 +513,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       HashMap<String, Object[]> hyperParms = new HashMap<String, Object[]>() {{
@@ -555,7 +555,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("smalldata/junit/cars_20mpg.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/junit/cars_20mpg.csv");
       Scope.track(trainingFrame);
       trainingFrame.remove(0);
 
@@ -588,7 +588,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       HashMap<String, Object[]> hyperParms = new HashMap<String, Object[]>() {{
@@ -625,7 +625,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       HashMap<String, Object[]> hyperParms = new HashMap<String, Object[]>() {{
@@ -675,7 +675,7 @@ public class GridTest extends TestUtil {
   public void testFailedParamsRetention() {
     try {
       Scope.enter();
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       // Setup random hyperparameter search space
@@ -747,7 +747,7 @@ public class GridTest extends TestUtil {
     try {
       Scope.enter();
 
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       HashMap<String, Object[]> hyperParms = new HashMap<String, Object[]>() {{
@@ -777,7 +777,7 @@ public class GridTest extends TestUtil {
   public void testParallelCartesian() {
     try {
       Scope.enter();
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       // Setup random hyperparameter search space
@@ -819,7 +819,7 @@ public class GridTest extends TestUtil {
   public void test_parallel_random_search_with_max_models_being_less_than_parallelism() {
     try {
       Scope.enter();
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       // Setup random hyperparameter search space
@@ -855,7 +855,7 @@ public class GridTest extends TestUtil {
   public void test_parallel_random_search_with_max_models_being_greater_than_parallelism() {
     try {
       Scope.enter();
-      final Frame trainingFrame = parse_test_file("smalldata/iris/iris_train.csv");
+      final Frame trainingFrame = parseTestFile("smalldata/iris/iris_train.csv");
       Scope.track(trainingFrame);
 
       // Setup random hyperparameter search space

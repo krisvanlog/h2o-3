@@ -1,10 +1,8 @@
 package hex.grid;
 
-import hex.ScoreKeeper;
 import hex.ScoreKeeper.StoppingMetric;
 import hex.grid.HyperSpaceSearchCriteria.StoppingCriteria;
 import hex.tree.gbm.GBMModel;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import water.Job;
@@ -17,7 +15,9 @@ import water.runner.H2ORunner;
 import java.util.*;
 
 import static org.junit.Assert.*;
-import static water.TestUtil.parse_test_file;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import static water.TestUtil.parseTestFile;
 
 @RunWith(H2ORunner.class)
 @CloudSize(1)
@@ -27,7 +27,7 @@ public class SequentialWalkerTest {
     public void test_SequentialWalker() {
         try {
             Scope.enter();
-            final Frame train = parse_test_file("./smalldata/testng/airlines_train.csv");
+            final Frame train = parseTestFile("./smalldata/testng/airlines_train.csv");
             Scope.track(train);
             
             GBMModel.GBMParameters gbmParameters = new GBMModel.GBMParameters();
@@ -98,7 +98,7 @@ public class SequentialWalkerTest {
     public void test_SequentialWalker_supports_early_stopping() {
         try {
             Scope.enter();
-            final Frame train = parse_test_file("./smalldata/testng/airlines_train.csv");
+            final Frame train = parseTestFile("./smalldata/testng/airlines_train.csv");
             Scope.track(train);
 
             GBMModel.GBMParameters gbmParameters = new GBMModel.GBMParameters();
