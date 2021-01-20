@@ -1774,6 +1774,7 @@ public class Frame extends Lockable<Frame> {
               break;
             case UUID:
               sb.append(PrettyPrint.UUID(_curChks[i].at16l(_chkRow), _curChks[i].at16h(_chkRow)));
+              break;
             default:
               throw new IllegalStateException("Unknown encoder " + _encoders[i]);
           }
