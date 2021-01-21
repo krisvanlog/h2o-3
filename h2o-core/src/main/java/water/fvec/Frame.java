@@ -1665,9 +1665,10 @@ public class Frame extends Lockable<Frame> {
       _chkRow = -1; // first process the header line
       _curChks = chks;
       _escapedCategoricalVecDomains = escapeCategoricalVecDomains(_curChks);
-      _encoders = new VecEncoder[_curChks.length];
-      for (int i = 0; i < _curChks.length; i++) {
-        Vec v = _curChks[i]._vec;
+      if (_curChks != null) {
+        _encoders = new VecEncoder[_curChks.length];
+        for (int i = 0; i < _curChks.length; i++) {
+          Vec v = _curChks[i]._vec;
           if (v.isCategorical()) {
             _encoders[i] = VecEncoder.CAT;
           } else if (v.isUUID()) {
@@ -1679,7 +1680,9 @@ public class Frame extends Lockable<Frame> {
           } else {
             _encoders[i] = VecEncoder.NUM;
           }
-      }
+        }
+      } else
+        _encoders = null;
     }
 
     private void appendColumnName(StringBuilder sb, String name) {
