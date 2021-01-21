@@ -1,7 +1,13 @@
 package hex.faulttolerance;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import hex.Model;
+import hex.grid.Grid;
+import hex.grid.GridSearch;
+import org.apache.log4j.Logger;
 import water.*;
+import water.api.GridSearchHandler;
 import water.fvec.Frame;
 import water.fvec.persist.FramePersist;
 import water.fvec.persist.PersistUtils;
@@ -13,8 +19,22 @@ import java.net.URI;
 import java.util.*;
 
 public class Recovery<T extends Keyed> {
+    
+    private static final Logger LOG = Logger.getLogger(Recovery.class);
 
     public static final String REFERENCES_META_FILE_SUFFIX = "_references";
+    public static final String RECOVERY_META_FILE = "recovery.json";
+    
+    public static final String INFO_CLASS = "class";
+    public static final String INFO_RESULT_KEY = "resultKey";
+    public static final String INFO_JOB_KEY = "jobKey";
+
+    public static void autoRecover(String autoRecoveryDir) {
+        if (autoRecoveryDir == null || autoRecoveryDir.length() == 0) {
+            return;
+        }
+        new Recovery(autoRecoveryDir).autoRecover();
+    }
 
     public enum ReferenceType {
         FRAME, KEYED
@@ -41,15 +61,20 @@ public class Recovery<T extends Keyed> {
     public String referencesMetaFile(Recoverable<T> r) {
         return recoveryFile(r.getKey().toString() + REFERENCES_META_FILE_SUFFIX);
     }
+    
+    public String recoveryMetaFile() {
+        return recoveryFile(RECOVERY_META_FILE);
+    }
 
     /**
      * Called when the training begins, so that initial state can be persisted
      * 
      * @param r a Recoverable to persist
      */
-    public void onStart(final Recoverable<T> r) {
+    public void onStart(final Recoverable<T> r, final Job job) {
         writtenFiles.addAll(r.exportBinary(storagePath, true));
         exportReferences(r);
+        writeRecoveryInfo(r, job.getKey());
     }
 
     /**
@@ -96,6 +121,16 @@ public class Recovery<T extends Keyed> {
         writtenFiles.add(referencesUri.toString());
         PersistUtils.write(referencesUri, ab -> ab.put(referenceKeyTypeMap));
     }
+    
+    public void writeRecoveryInfo(final Recoverable<T> r, Key<Job> jobKey) {
+        Map<String, String> info = new HashMap<>();
+        info.put(INFO_CLASS, r.getClass().getName());
+        info.put(INFO_JOB_KEY, jobKey.toString());
+        info.put(INFO_RESULT_KEY, r.getKey().toString());
+        final URI infoUri = FileUtils.getURI(recoveryMetaFile());
+        writtenFiles.add(infoUri.toString());
+        PersistUtils.writeStream(infoUri, w -> w.write(new Gson().toJson(info)));
+    }
 
     private void persistObj(
         final Keyed<?> o,
@@ -131,6 +166,30 @@ public class Recovery<T extends Keyed> {
             }
         });
         fs.blockForPending();
+    }
+    
+    public void autoRecover() {
+        URI recoveryMetaUri = FileUtils.getURI(recoveryMetaFile());
+        if (!PersistUtils.exists(recoveryMetaUri)) {
+            return;
+        }
+        Map<String, String> recoveryInfo = PersistUtils.readStream(
+            recoveryMetaUri, 
+            r -> new Gson().fromJson(r, new TypeToken<Map<String, String>>(){}.getType())
+        ); 
+        String className = recoveryInfo.get(INFO_CLASS);
+        Key<Job> jobKey = Key.make(recoveryInfo.get(INFO_JOB_KEY));
+        Key<?> resultKey = Key.make(recoveryInfo.get(INFO_RESULT_KEY));
+        if (Grid.class.getName().equals(className)) {
+            Grid grid = Grid.importBinary(recoveryFile(resultKey), true);
+            GridSearch.resumeGridSearch(
+                jobKey, grid,
+                new GridSearchHandler.DefaultModelParametersBuilderFactory(),
+                (Recovery<Grid>) this
+            );
+        } else {
+            LOG.error("Unable to recover object of class " + className);
+        }
     }
 
 }

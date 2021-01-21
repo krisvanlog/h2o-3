@@ -24,5 +24,5 @@ public interface Recoverable<T extends Keyed> {
      * @return list of all keys of objects this recoverable needs to resume operation after recovery
      */
     Set<Key<?>> getDependentKeys();
-    
+
 }

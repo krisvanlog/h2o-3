@@ -44,6 +44,10 @@ while (( "$#" )); do
       contextPathArgs="-context_path $2"
       shift 2
       ;;
+    --auto-recovery-dir)
+      autoRecoveryArgs="-auto_recovery_dir $2"
+      shift 2
+      ;;
     --use-external-xgb)
       useExternalXGBoost=yes
       shift
@@ -83,6 +87,7 @@ hadoop jar h2o-hadoop-*/h2o-${hadoopVersion}-assembly/build/libs/h2odriver.jar \
     ${contextPathArgs} \
     ${loginArgs} \
     ${xgbArgs} \
+    ${autoRecoveryArgs} \
     ${disownArgs} \
     -notify ${notifyFile} \
     > ${driverLogFile} 2>&1 &
