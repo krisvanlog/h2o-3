@@ -11,7 +11,7 @@ def get_script_path(env_var):
     return os.getenv("H2O_HOME") + "/" + os.getenv(env_var)
 
 
-def start_cluster(name):
+def start_cluster(name, enable_auto_recovery=False):
     script = get_script_path("H2O_START_SCRIPT")
     notify_file = "notify_" + name
     driver_log_file = "driver_" + name + ".log"
@@ -25,9 +25,15 @@ def start_cluster(name):
         "--driver-log-file", driver_log_file,
         "--hadoop-version", os.getenv("H2O_HADOOP"),
         "--job-name", job_name,
-        "--nodes", "3", "--xmx", "8G",
-        "--disown"
+        "--nodes", "3", "--xmx", "8G"
     ]
+    if enable_auto_recovery:
+        recovery_dir = get_workdir() + "_recovery"
+        args.append("--auto-recovery-dir")
+        args.append(recovery_dir)
+        args.append("--proxy")
+    else:
+        args.append("--disown")
     notify_file_path = os.getenv("H2O_HOME") + "/" + notify_file
     if os.path.exists(notify_file_path):
         os.remove(notify_file_path)

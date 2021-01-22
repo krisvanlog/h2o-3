@@ -56,6 +56,10 @@ while (( "$#" )); do
       enableLogin=yes
       shift
       ;;
+    --proxy)
+      proxy=yes
+      shift
+      ;;
     --disown)
       disown=yes
       shift
@@ -74,6 +78,9 @@ if [ "${enableLogin}" = "yes" ]; then
   echo "jenkins:${clusterName}" >> ${clusterName}.realm.properties
   loginArgs="-hash_login -login_conf ${clusterName}.realm.properties"
 fi
+if [ "${proxy}" = "yes" ]; then 
+  proxyArgs="-proxy"
+fi
 if [ "${disown}" = "yes" ]; then 
   disownArgs="-disown"
 fi
@@ -84,11 +91,8 @@ hadoop jar h2o-hadoop-*/h2o-${hadoopVersion}-assembly/build/libs/h2odriver.jar \
     -jobname ${jobName} -ea \
     -clouding_method filesystem -clouding_dir ${cloudingDir} \
     -n ${nodes} -mapperXmx ${xmx} -baseport 54445 -timeout 360 \
-    ${contextPathArgs} \
-    ${loginArgs} \
-    ${xgbArgs} \
-    ${autoRecoveryArgs} \
-    ${disownArgs} \
+    ${contextPathArgs} ${loginArgs} ${xgbArgs} \
+    ${autoRecoveryArgs} ${proxyArgs} ${disownArgs} \
     -notify ${notifyFile} \
     > ${driverLogFile} 2>&1 &
 for i in $(seq 36); do
