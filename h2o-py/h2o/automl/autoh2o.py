@@ -56,7 +56,7 @@ class H2OAutoML(H2OAutoMLBaseMixin, Keyed):
     """
     
     def __init__(self,
-                 nfolds=5,
+                 nfolds="AUTO",
                  balance_classes=False,
                  class_sampling_factors=None,
                  max_after_balance_size=5.0,
@@ -182,8 +182,10 @@ class H2OAutoML(H2OAutoMLBaseMixin, Keyed):
         check_id(project_name, "H2OAutoML")
         self._project_name = self.build_control["project_name"] = project_name
 
+        if nfolds == "AUTO":
+            nfolds = -1
         assert_is_type(nfolds, int)
-        assert nfolds >= 0, "nfolds set to " + str(nfolds) + "; nfolds cannot be negative. Use nfolds >=2 if you want cross-valiated metrics and Stacked Ensembles or use nfolds = 0 to disable."
+        assert nfolds >= 0 or nfolds == -1, "nfolds set to " + str(nfolds) + "; nfolds cannot be negative. Use nfolds >=2 if you want cross-valiated metrics and Stacked Ensembles or use nfolds = 0 to disable."
         assert nfolds is not 1, "nfolds set to " + str(nfolds) + "; nfolds = 1 is an invalid value. Use nfolds >=2 if you want cross-valiated metrics and Stacked Ensembles or use nfolds = 0 to disable."
         self.nfolds = self.build_control["nfolds"] = nfolds
 
