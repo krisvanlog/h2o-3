@@ -469,9 +469,9 @@ h2o.clusterStatus <- function() {
 #'        cluster's configuration.
 #' @export
 h2o.resume <- function(recovery_dir=NULL) {
-    parms <- list()
-    parms$recovery_dir <- recovery_dir
-    invisible(.h2o.__remoteSend(.h2o.__RESUME, method = "POST", .params = parms))},
+  parms <- list()
+  parms$recovery_dir <- recovery_dir
+  invisible(.h2o.__remoteSend(.h2o.__RESUME, method = "POST", .params = parms))
 }
 
 #
