@@ -193,6 +193,7 @@ h2o.grid <- function(algorithm,
 #' @param recovery_dir When specified the grid and all necessary data (frames, models) will be saved to this
 #'        directory (use HDFS or other distributed file-system). Should the cluster crash during training, the grid
 #'        can be reloaded from this directory via \code{h2o.loadGrid} and training can be resumed
+#' @param ...  Additional parameters to modify the resumed Grid.
 #' @export
 h2o.resumeGrid <- function(grid_id, recovery_dir=NULL, ...) {
     grid <- h2o.getGrid(grid_id = grid_id)
