@@ -59,7 +59,7 @@ public class GamMojoModelTest {
       // test for binomial
       String[] ignoredCols = new String[]{"C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14",
               "C15", "C16", "C17", "C18", "C19", "C20"};
-      String[][] gamCols = new String[][]{{"C11", "C12", "C13"}};
+      String[][] gamCols = new String[][]{{"C11"}, {"C12"}, {"C13"}};
       Frame trainBinomial = Scope.track(massageFrame(parse_test_file("smalldata/glm_test/binomial_20_cols_10KRows.csv"),
               binomial));
       DKV.put(trainBinomial);
@@ -85,7 +85,7 @@ public class GamMojoModelTest {
     try {
       String[] ignoredCols = new String[]{"C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10", "C11", "C12", "C13", "C14",
               "C15", "C16", "C17", "C18", "C19", "C20"};
-      String[][] gamCols = new String[][]{{"C11", "C12", "C13"}};
+      String[][] gamCols = new String[][]{{"C11"}, {"C12"}, {"C13"}};
       Frame trainGaussian = Scope.track(massageFrame(parse_test_file("smalldata/glm_test/gaussian_20cols_10000Rows.csv"), gaussian));
       DKV.put(trainGaussian);
       GAMModel gaussianmodel = getModel(gaussian,
@@ -111,7 +111,7 @@ public class GamMojoModelTest {
     try {
       // multinomial
       String[] ignoredCols = new String[]{"C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"};
-      String[][] gamCols = new String[][]{{"C6", "C7", "C8"}};
+      String[][] gamCols = new String[][]{{"C6"}, {"C7"}, {"C8"}};
       Frame trainMultinomial = Scope.track(massageFrame(parse_test_file("smalldata/glm_test/multinomial_10_classes_10_cols_10000_Rows_train.csv"), multinomial));
       DKV.put(trainMultinomial);
       GAMModel multinomialModel = getModel(multinomial,
@@ -122,6 +122,30 @@ public class GamMojoModelTest {
       Scope.track_generic(multinomialModel);
       Frame predictMult = Scope.track(multinomialModel.score(trainMultinomial));
       assertTrue(multinomialModel.testJavaScoring(trainMultinomial, predictMult, _tol)); // compare scoring result with mojo
+    } finally {
+      Scope.exit();
+    }
+  }
+
+  @Test
+  public void testMojoThinPlateRegression() {
+    Scope.enter();
+    try {
+      Frame train = Scope.track(parse_test_file("smalldata/glm_test/multinomial_10_classes_10_cols_10000_Rows_train.csv"));
+      String[] ignoredCols = new String[]{"C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9", "C10"};
+      String[][] gamCols = new String[][]{{"C6"},{"C7", "C8"}, {"C9"}};
+      GAMModel.GAMParameters params = new GAMModel.GAMParameters();
+      int k = 5;
+      params._response_column = "C11";
+      params._ignored_columns = ignoredCols;
+      params._num_knots = new int[]{0,k,0};
+      params._gam_columns = gamCols;
+      params._train = train._key;
+      params._savePenaltyMat = true;
+      GAMModel gam = new GAM(params).trainModel().get();
+      Frame predictMult = Scope.track(gam.score(train));
+      assertTrue(gam.testJavaScoring(train, predictMult, _tol)); // compare scoring result with mojo      
+      Scope.track_generic(gam);
     } finally {
       Scope.exit();
     }

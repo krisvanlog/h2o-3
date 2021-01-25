@@ -79,6 +79,7 @@ public class GamThinPlateRegressionBasicTest extends TestUtil {
       Scope.exit();
     }
   }
+  
   @Test
   public void testKnotsGenerationFromFrame() {
     Scope.enter();

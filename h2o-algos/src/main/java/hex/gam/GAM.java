@@ -249,8 +249,7 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
     if ((_parms._bs != null) && (_parms._gam_columns.length != _parms._bs.length))  // check length
       error("gam colum number", "Number of gam columns implied from _bs and _gam_columns do not " +
               "match.");
-    if (_thinPlateSmoothersWithKnotsNum > 0)
-      setThinPlateParameters(_parms, _thinPlateSmoothersWithKnotsNum); // set the m, M for thin plate regression smoothers
+    setGamPredSize(_parms, _cubicSplineNum);
     checkOrChooseNumKnots(); // check valid num_knot assignment or choose num_knots
     if ((_parms._num_knots != null) && (_parms._num_knots.length != _parms._gam_columns.length))
       error("gam colum number", "Number of gam columns implied from _num_knots and _gam_columns do" +
@@ -262,6 +261,8 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
     }
     _knots = generateKnotsFromKeys(); // generate knots and verify that they are given correctly
     sortGAMParameters(_parms, _cubicSplineNum, _thinPlateSmoothersWithKnotsNum); // move cubic spline to the front and thin plate to the back
+    if (_thinPlateSmoothersWithKnotsNum > 0)
+      setThinPlateParameters(_parms, _thinPlateSmoothersWithKnotsNum); // set the m, M for thin plate regression smoothers
     checkThinPlateParams();
     if (_parms._saveZMatrix && ((_train.numCols() - 1 + _parms._num_knots.length) < 2))
       error("_saveZMatrix", "can only be enabled if we number of predictors plus" +
@@ -453,7 +454,7 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
                                                   int thinPlateInd) {
         _predictVec  = predV;
         _knots = knots;
-        _numKnots = knots[0].length;
+        _numKnots = knots[gamColIndex].length;
         _numKnotsM1 = _numKnots-1;
         _parms = parms;
         _splineType = _parms._bs_sorted[gamColIndex];
@@ -489,8 +490,8 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
         thinPlateFrame = ThinPlateDistanceWithKnots.applyTransform(thinPlateFrame, colNameStub
                         +"TPKnots_", _parms, zCST, _numKnotsMM);        // generate Xcs as in 3.3
         if (_savePenaltyMat) {  // save intermediate steps for debugging
-          copy2DArray(starT, _starT[_thinPlateGamColIndex]);
           copy2DArray(penaltyMat, _penalty_mat[_gamColIndex]);
+          copy2DArray(starT, _starT[_thinPlateGamColIndex]);
           copy2DArray(penaltyMatCS, _penalty_mat_CS[_thinPlateGamColIndex]);
         }
         ThinPlatePolynomialWithKnots thinPlatePoly = new ThinPlatePolynomialWithKnots(_numPred,
@@ -585,7 +586,7 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
           _gamColNames[index] = new String[kPlusM];
           _gamColNamesCenter[index] = new String[numKnotsM1];
           _gamColMeans[index] = new double[kPlusM];
-          _allPolyBasisList[thinPlateInd] = new int[_parms._M[thinPlateInd]][_parms._gamPredSize[thinPlateInd]];
+          _allPolyBasisList[thinPlateInd] = new int[_parms._M[thinPlateInd]][_parms._gamPredSize[index]];
           generateGamColumn[index] = new ThinPlateRegressionSmootherWithKnots(predictVec, _parms, index, _knots[index], 
                   thinPlateInd++);
         }
@@ -744,6 +745,8 @@ public class GAM extends ModelBuilder<GAMModel, GAMModel.GAMParameters, GAMModel
       model._output._binvD = _binvD;
       model._output._knots = _knots;
       model._output._numKnots = _numKnots;
+      model._cubicSplineNum = _cubicSplineNum;
+      model._thinPlateSmoothersWithKnotsNum = _thinPlateSmoothersWithKnotsNum;
       // extract and store best_alpha/lambda/devianceTrain/devianceValid from best submodel of GLM model
       model._output._best_alpha = glm._output.getSubmodel(glm._output._selected_submodel_idx).alpha_value;
       model._output._best_lambda = glm._output.getSubmodel(glm._output._selected_submodel_idx).lambda_value;

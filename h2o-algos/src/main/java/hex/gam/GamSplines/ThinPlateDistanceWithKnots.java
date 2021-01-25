@@ -13,6 +13,7 @@ import water.util.ArrayUtils;
 
 import static hex.gam.GAMModel.GAMParameters;
 import static hex.gam.GamSplines.ThinPlatePolynomialBasisUtils.*;
+import static hex.genmodel.algos.gam.GamUtilsThinPlateRegression.calculateDistance;
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 
 // Implementation details of this class can be found in GamThinPlateRegressionH2O.doc attached to this 
@@ -93,20 +94,5 @@ public class ThinPlateDistanceWithKnots extends MRTask<ThinPlateDistanceWithKnot
       System.arraycopy(tempVal, 0, penaltyMat[index], 0, _knotNum);
     }
     return penaltyMat;
-  }
-
-  public static void calculateDistance(double[] rowValues, double[] chk, int knotNum, double[][] knots, int d,
-                                       boolean dEven, double constantTerms) { // see 3.1
-    for (int knotInd = 0; knotInd < knotNum; knotInd++) { // calculate distance between data and knots
-      double sumSq = 0;
-      for (int predInd = 0; predInd < d; predInd++) {
-        double temp = chk[predInd] - knots[predInd][knotInd];
-        sumSq += temp*temp;
-      }
-      double distance = Math.sqrt(sumSq);
-      rowValues[knotInd] = constantTerms*distance;
-      if (dEven && (distance != 0))
-        rowValues[knotInd] *= Math.log(distance);
-    }
   }
 }

@@ -6,6 +6,7 @@ import water.fvec.Chunk;
 import water.fvec.NewChunk;
 
 import static hex.gam.GamSplines.ThinPlatePolynomialBasisUtils.*;
+import static hex.genmodel.algos.gam.GamUtilsThinPlateRegression.calculatePolynomialBasis;
 
 public class ThinPlatePolynomialWithKnots extends MRTask<ThinPlatePolynomialWithKnots> {
   final int _weightID;
@@ -30,25 +31,13 @@ public class ThinPlatePolynomialWithKnots extends MRTask<ThinPlatePolynomialWith
         if (checkRowNA(chk, rowIndex)) {
           fillRowOneValue(newGamCols, _M, Double.NaN);
         } else {
-          calculatePolynomialBasis(onePolyRow, oneDataRow, chk, rowIndex, _d, _M, _polyBasisList);
+          extractOneRowFromChunk(chk, rowIndex, oneDataRow, _d); // extract data to oneDataRow
+          calculatePolynomialBasis(onePolyRow, oneDataRow, _d, _M, _polyBasisList);
           fillRowArray(newGamCols, _M, onePolyRow);
         }
       } else {  // set the row to zero
         fillRowOneValue(newGamCols, _M, 0.0);
       }
-    }
-  }
-  
-  public static void calculatePolynomialBasis(double[] onePolyRow, double[] oneDataRow, Chunk[] chk, int rowIndex, 
-                                              int d, int M, int[][] polyBasisList) {
-    extractOneRowFromChunk(chk, rowIndex, oneDataRow, d);
-    for (int colIndex = 0; colIndex < M; colIndex++) {
-      int[] oneBasis = polyBasisList[colIndex];
-      double val = 1.0;
-      for (int predIndex = 0; predIndex < d; predIndex++) {
-        val *= Math.pow(oneDataRow[predIndex], oneBasis[predIndex]);
-      }
-      onePolyRow[colIndex] = val;
     }
   }
   

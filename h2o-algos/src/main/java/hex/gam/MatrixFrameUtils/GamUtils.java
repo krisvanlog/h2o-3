@@ -185,17 +185,28 @@ public class GamUtils {
 
   public static void setThinPlateParameters(GAMParameters parms, int thinPlateNum) {
     int numGamCols = parms._gam_columns.length;
-    parms._gamPredSize = MemoryManager.malloc4(thinPlateNum);
     parms._m = MemoryManager.malloc4(thinPlateNum);
     parms._M = MemoryManager.malloc4(thinPlateNum);
     int countThinPlate = 0;
     for (int index = 0; index < numGamCols; index++) {
-      if (parms._bs[index] == 1) { // todo: add in bs==2 when it is supported
-        parms._gamPredSize[countThinPlate] = parms._gam_columns[index].length;
-        parms._m[countThinPlate] = calculatem(parms._gamPredSize[countThinPlate]);
-        parms._M[countThinPlate] = calculateM(parms._gamPredSize[countThinPlate], parms._m[countThinPlate]);
+      if (parms._bs_sorted[index] == 1) { // todo: add in bs==2 when it is supported
+        parms._m[countThinPlate] = calculatem(parms._gamPredSize[index]);
+        parms._M[countThinPlate] = calculateM(parms._gamPredSize[index], parms._m[countThinPlate]);
         countThinPlate++;
       }
+    }
+  }
+  
+  public static void setGamPredSize(GAMParameters parms, int csOffset) {
+    int numGamCols = parms._gam_columns.length;
+    int tpCount = csOffset;
+    int csCount = 0;
+    parms._gamPredSize = MemoryManager.malloc4(numGamCols);
+    for (int index = 0; index < numGamCols; index++) {
+      if (parms._gam_columns[index].length == 1) // CS
+        parms._gamPredSize[csCount++] = 1; 
+      else   // TP
+        parms._gamPredSize[tpCount++] = parms._gam_columns[index].length;
     }
   }
 
@@ -310,19 +321,22 @@ public class GamUtils {
     int csIndex = 0;
     int tpIndex = csNum;
     parms._gam_columns_sorted = new String[gamColNum][];
-    parms._num_knots_sorted = new int[gamColNum];
-    parms._scale_sorted = new double[gamColNum];
-    parms._bs_sorted = new int[gamColNum];
+    parms._num_knots_sorted = MemoryManager.malloc4(gamColNum);
+    parms._scale_sorted = MemoryManager.malloc8d(gamColNum);
+    parms._bs_sorted = MemoryManager.malloc4(gamColNum);
+    parms._gamPredSize = MemoryManager.malloc4(gamColNum);
     for (int index = 0; index < gamColNum; index++) {
       if (parms._gam_columns[index].length == 1) { // cubic spline
         parms._gam_columns_sorted[csIndex] = parms._gam_columns[index].clone();
         parms._num_knots_sorted[csIndex] = parms._num_knots[index];
         parms._scale_sorted[csIndex] = parms._scale[index];
+        parms._gamPredSize[csIndex] = parms._gam_columns_sorted[csIndex].length;
         parms._bs_sorted[csIndex++] = parms._bs[index];
       } else {  // thin plate
         parms._gam_columns_sorted[tpIndex] = parms._gam_columns[index].clone();
         parms._num_knots_sorted[tpIndex] = parms._num_knots[index];
         parms._scale_sorted[tpIndex] = parms._scale[index];
+        parms._gamPredSize[tpIndex] = parms._gam_columns_sorted[tpIndex].length;
         parms._bs_sorted[tpIndex++] = parms._bs[index];
       }
     }

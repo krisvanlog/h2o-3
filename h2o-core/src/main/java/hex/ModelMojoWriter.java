@@ -1,8 +1,6 @@
 package hex;
 
 import hex.genmodel.AbstractMojoWriter;
-import hex.genmodel.descriptor.ModelDescriptor;
-import water.Key;
 import water.api.SchemaServer;
 import water.api.StreamWriteOption;
 import water.api.StreamWriter;
@@ -117,6 +115,16 @@ public abstract class ModelMojoWriter<M extends Model<M, P, O>, P extends Model.
     finishWritingTextFile();
   }
 
+  public void write2DStringArrays(String[][] sArrays, String title) throws IOException {
+    startWritingTextFile(title);
+    int numCols = sArrays.length;
+    for (int index = 0; index < numCols; index++)
+    for (String sName : sArrays[index]) {
+      writeln(sName);
+    }
+    finishWritingTextFile();
+  }
+
   public void writeDoubleArray(double[][] array, String title) throws IOException {
     int totArraySize = 0;
     for (double[] row : array)
@@ -126,6 +134,38 @@ public abstract class ModelMojoWriter<M extends Model<M, P, O>, P extends Model.
     for (double[] row : array)
       for (double val : row)
         bb.putDouble(val);
+    writeblob(title, bb.array());
+  }
+
+  public void writeTripleIntArray(int[][][] array, String title) throws IOException {
+    int totArraySize = 0;
+    int outDim = array.length;
+    for (int index = 0; index < outDim; index++) {
+      for (int[] row : array[index])
+        totArraySize += row.length;
+    }
+
+    ByteBuffer bb = ByteBuffer.wrap(new byte[totArraySize * 8]);
+    for (int index = 0; index < outDim; index++)
+      for (int[] row : array[index])
+        for (int val : row)
+          bb.putInt(val);
+    writeblob(title, bb.array());
+  }
+  
+  public void writeTripleArray(double[][][] array, String title) throws IOException {
+    int totArraySize = 0;
+    int outDim = array.length;
+    for (int index = 0; index < outDim; index++) {
+      for (double[] row : array[index])
+        totArraySize += row.length;
+    }
+
+    ByteBuffer bb = ByteBuffer.wrap(new byte[totArraySize * 8]);
+    for (int index = 0; index < outDim; index++)
+      for (double[] row : array[index])
+        for (double val : row)
+          bb.putDouble(val);
     writeblob(title, bb.array());
   }
 }

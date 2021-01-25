@@ -4,7 +4,6 @@ import Jama.Matrix;
 import Jama.QRDecomposition;
 import water.fvec.Chunk;
 import water.fvec.NewChunk;
-import water.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -19,18 +18,18 @@ import static water.util.ArrayUtils.maxValue;
 public class ThinPlatePolynomialBasisUtils {
   /***
    * For thin plate regression, given d (number of predictors for a smooth), it will return m where (m-1) is the
-   * maximum polynomial degree in the polynomial basis functions.  The formular used is m = ceiling of (d+1)/2+1
-   * 
+   * maximum polynomial degree in the polynomial basis functions.  The formula used is m = ceiling of (d+1)/2+1
+   *
    * @param d : integer denoting number of predictors for thin plate regression smooth.
    * @return m : integer denoting the maximum polynomial degree + 1 for polynomial basis function.
    */
   public static int calculatem(int d) {
     return ((int) Math.floor((d+1.0)*0.5))+1;
   }
-  
+
   public static int calculateM(int d, int m) {
     int topComb = d+m-1;
-    return MathUtils.combinatorial(topComb, d);
+    return hex.genmodel.utils.MathUtils.combinatorial(topComb, d);
   }
 
   /***

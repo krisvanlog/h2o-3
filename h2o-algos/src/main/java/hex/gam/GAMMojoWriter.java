@@ -51,19 +51,30 @@ public class GAMMojoWriter extends ModelMojoWriter<GAMModel, GAMModel.GAMParamet
       writekv("tweedie_link_power", model._parms._tweedie_link_power);
     // add GAM specific parameters
     writekv("num_knots", model._parms._num_knots); // an array
-    writeStringArrays(model._parms._gam_columns[0], "gam_columns"); // gam_columns specified by users
+    writekv("num_knots_sorted", model._parms._num_knots_sorted); // an array
+    write2DStringArrays(model._parms._gam_columns, "gam_columns"); // gam_columns specified by users
+    write2DStringArrays(model._parms._gam_columns_sorted, "gam_columns_sorted"); // gam_columns specified by users
     int numGamLength = 0;
     int numGamCLength = 0;
-    for (int cInd=0; cInd < numGamCols; cInd++)  { // only contains expanded gam column names not centered
-      writeStringArrays(model._gamColNames[cInd], "gamColNamesCenter_"+model._parms._gam_columns[cInd]);
-      writeStringArrays(model._gamColNamesNoCentering[cInd], "gamColNames_"+model._parms._gam_columns[cInd]);
+    for (int cInd=0; cInd < numGamCols; cInd++)  { // contains expanded gam column names center and not centered
+     // writeStringArrays(model._gamColNames[cInd], "gamColNamesCenter_"+model._parms._gam_columns[cInd][0]);
+     // writeStringArrays(model._gamColNamesNoCentering[cInd], "gamColNames_"+model._parms._gam_columns[cInd][0]);
       numGamLength += model._gamColNamesNoCentering[cInd].length;
       numGamCLength += model._gamColNames[cInd].length;
     }
+    int[] gamColumnDim = genGamColumnDim(model._parms._gam_columns);
+    writekv("gam_column_dim", gamColumnDim); // an array indicating array size of parms._gam_columns
+    int[] gamColumnDimSorted = genGamColumnDim(model._parms._gam_columns_sorted);
+    writekv("gam_column_dim_sorted", gamColumnDimSorted); // an array
     String[] trainColGamColNoCenter = genTrainColGamCols(numGamLength, numGamCLength);
     writekv("num_expanded_gam_columns", numGamLength);
+    writekv("num_expanded_gam_columns_center", numGamCLength);
     writeStringArrays(trainColGamColNoCenter, "_names_no_centering"); // column names without centering
     writekv("total feature size", trainColGamColNoCenter.length);
+    int[] gamColNamesDim = genGamColumnDim(model._gamColNamesNoCentering);
+    writekv("gamColName_dim", gamColNamesDim);
+    write2DStringArrays(model._gamColNames, "gamColNamesCenter"); // numGamCol by numKnots for CS, by numKnots+M for TP
+    write2DStringArrays(model._gamColNamesNoCentering,"gamColNames"); // numGamCol by numKnots-1
     if (model._parms._family==multinomial || model._parms._family==ordinal) {
       writeDoubleArray(model._output._model_beta_multinomial_no_centering, "beta_multinomial");
       writekv("beta length per class", model._output._model_beta_multinomial_no_centering[0].length);
@@ -76,12 +87,30 @@ public class GAMMojoWriter extends ModelMojoWriter<GAMModel, GAMModel.GAMParamet
       writekv("beta center length per class", model._output._model_beta.length);
     }
     writekv("bs", model._parms._bs);  // an array of choice of spline functions
-    writeDoubleArray(model._output._knots[0], "knots"); // todo fix me
-    int countGamCols = 0;
-    for (String gamCol : model._parms._gam_columns[0]) {// todo fix
-      writeDoubleArray(model._output._zTranspose[countGamCols], gamCol+"_zTranspose");      // write zTranspose
-      writeDoubleArray(model._output._binvD[countGamCols++], gamCol+"_binvD");      // write binvD
+    writekv("bs_sorted", model._parms._bs_sorted);  // an array of choice of spline functions
+    writeTripleArray(model._output._knots, "knots"); // todo fix me
+    writeTripleArray(model._output._zTranspose, "zTranspose");
+    writekv("_d", model._parms._gamPredSize);
+    if (model._output._zTransposeCS != null) {  // write array only if it is not null
+      writeTripleIntArray(model._output._allPolyBasisList, "polynomialBasisList");
+      writeTripleArray(model._output._zTransposeCS, "zTransposeCS");
+      writekv("_M", model._M);
+      writekv("_m", model._m);
+      writekv("num_knots_TP", model._parms._num_knots_tp); // an array
+      writekv("num_TP_col", model._M.length);
+    } else {
+      writekv("num_TP_col", 0);
     }
+    if (model._cubicSplineNum > 0)
+      writeTripleArray(model._output._binvD, "_binvD");
+  }
+  
+  public int[] genGamColumnDim(String[][] gamColumnNames) {
+    int numGamCols = gamColumnNames.length;
+    int[] gamColDim = new int[numGamCols];
+    for (int index = 0; index < numGamCols; index++)
+      gamColDim[index] = gamColumnNames[index].length;
+    return gamColDim;
   }
   
   public String[] genTrainColGamCols(int gamColLength, int gamCColLength) {

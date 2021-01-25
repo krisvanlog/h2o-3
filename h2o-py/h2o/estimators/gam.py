@@ -40,7 +40,7 @@ class H2OGeneralizedAdditiveEstimator(H2OEstimator):
                    "beta_constraints", "max_active_predictors", "interactions", "interaction_pairs", "obj_reg",
                    "export_checkpoints_dir", "stopping_rounds", "stopping_metric", "stopping_tolerance",
                    "balance_classes", "class_sampling_factors", "max_after_balance_size", "max_confusion_matrix_size",
-                   "max_runtime_secs", "custom_metric_func", "num_knots", "knot_ids", "gam_columns", "bs", "scale",
+                   "max_runtime_secs", "custom_metric_func", "num_knots", "k", "knot_ids", "gam_columns", "bs", "scale",
                    "keep_gam_cols", "auc_type"}
 
     def __init__(self, **kwargs):
@@ -945,9 +945,25 @@ class H2OGeneralizedAdditiveEstimator(H2OEstimator):
 
 
     @property
+    def k(self):
+        """
+        Number of eigenvectors to use in SVD for thin plate regression.  If specified, must be of the same length as
+        gam_columns even if the bs type is not thin-plate regression with SVD.
+
+        Type: ``List[int]``.
+        """
+        return self._parms.get("k")
+
+    @k.setter
+    def k(self, k):
+        assert_is_type(k, None, [int])
+        self._parms["k"] = k
+
+
+    @property
     def knot_ids(self):
         """
-        String arrays storing frame keys of knots.  One for each gam column specified in gam_columns
+        String arrays storing frame keys of knots.  One for each gam column set specified in gam_columns
 
         Type: ``List[str]``.
         """
@@ -962,22 +978,24 @@ class H2OGeneralizedAdditiveEstimator(H2OEstimator):
     @property
     def gam_columns(self):
         """
-        Predictor column names for gam
+        Arrays of predictor column names for gam for smoothers using single or multiple predictors like
+        {{'c1'},{'c2','c3'},{'c4'},...}
 
-        Type: ``List[str]``.
+        Type: ``List[List[str]]``.
         """
         return self._parms.get("gam_columns")
 
     @gam_columns.setter
     def gam_columns(self, gam_columns):
-        assert_is_type(gam_columns, None, [str])
+        assert_is_type(gam_columns, None, [[str]])
         self._parms["gam_columns"] = gam_columns
 
 
     @property
     def bs(self):
         """
-        Basis function type for each gam predictors, 0 for cr
+        Basis function type for each gam predictors, 0 for cr, 1 for thin plate regression with knots, 2 for thin plate
+        regression with SVD.  If specified, must be the same size as gam_columns
 
         Type: ``List[int]``.
         """
@@ -992,7 +1010,7 @@ class H2OGeneralizedAdditiveEstimator(H2OEstimator):
     @property
     def scale(self):
         """
-        Smoothing parameter for gam predictors
+        Smoothing parameter for gam predictors.  If specified, must be of the same length as gam_columns
 
         Type: ``List[float]``.
         """
