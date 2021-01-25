@@ -2350,6 +2350,9 @@ final public class H2O {
     
     if (H2O.isFlatfileEnabled()) {
       Recovery.autoRecover(H2O.ARGS.auto_recovery_dir);
+    } else if (H2O.ARGS.auto_recovery_dir != null) {
+      Log.info("Cluster is not flat-file enabled and will not perform auto-recovery. " + 
+          "Use h2o.resume() if you wish to resume unfinished work from " + H2O.ARGS.auto_recovery_dir);
     }
   }
 
