@@ -92,8 +92,8 @@ hadoop jar h2o-hadoop-*/h2o-${hadoopVersion}-assembly/build/libs/h2odriver.jar \
     -clouding_method filesystem -clouding_dir ${cloudingDir} \
     -n ${nodes} -mapperXmx ${xmx} -baseport 54445 -timeout 360 \
     ${contextPathArgs} ${loginArgs} ${xgbArgs} \
-    ${autoRecoveryArgs} ${proxyArgs} ${disownArgs} \
-    -notify ${notifyFile} \
+    ${autoRecoveryArgs} ${disownArgs} \
+    -notify ${notifyFile} ${proxyArgs} \
     > ${driverLogFile} 2>&1 &
 for i in $(seq 36); do
   if [ -f "${notifyFile}" ]; then

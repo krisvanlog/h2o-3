@@ -12,14 +12,16 @@ import unittest
 import threading
 
 
-class GridReloadTest(unittest.TestCase):
-    
+class GridAutoRecoveryTest(unittest.TestCase):
+
     def _training_thread(self, grid, train):
+        self.training_error = None
         try:
             print("starting initial grid...")
             grid.train(x=list(range(4)), y=4, training_frame=train)
-            self.training_error = None
         except Exception as e:
+            print("Error while training")
+            print(e)
             self.training_error = e
 
     def _wait_for_model_to_build(self, grid_id, model_count=1):
@@ -43,8 +45,7 @@ class GridReloadTest(unittest.TestCase):
     def _check_training_error(self):
         assert self.training_error is None
 
-
-def test_frame_reload(self):
+    def test_frame_auto_recovery(self):
         name_node = pyunit_utils.hadoop_namenode()
         work_dir = "hdfs://%s%s" % (name_node, utils.get_workdir())
         dataset = "/datasets/iris_wheader.csv"
@@ -71,7 +72,10 @@ def test_frame_reload(self):
                 hyper_params=hyper_parameters,
                 recovery_dir=work_dir
             )
-            bg_train_thread = threading.Thread(self._training_thread(), kwargs={grid: grid, train: train})
+            bg_train_thread = threading.Thread(
+                target=self._training_thread,
+                kwargs={"grid": grid, "train": train}
+            )
             bg_train_thread.start()
             phase_1_models = self._wait_for_model_to_build(grid_id)
             self._print_models("Initial models", phase_1_models)
