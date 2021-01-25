@@ -47,7 +47,6 @@ class GridAutoRecoveryTest(unittest.TestCase):
 
     def test_frame_auto_recovery(self):
         name_node = pyunit_utils.hadoop_namenode()
-        work_dir = "hdfs://%s%s" % (name_node, utils.get_workdir())
         dataset = "/datasets/iris_wheader.csv"
 
         ntrees_opts = [100, 120, 130, 140]
@@ -69,8 +68,7 @@ class GridAutoRecoveryTest(unittest.TestCase):
             grid = H2OGridSearch(
                 H2OGradientBoostingEstimator,
                 grid_id=grid_id,
-                hyper_params=hyper_parameters,
-                recovery_dir=work_dir
+                hyper_params=hyper_parameters
             )
             bg_train_thread = threading.Thread(
                 target=self._training_thread,

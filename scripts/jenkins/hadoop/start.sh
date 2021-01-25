@@ -90,18 +90,18 @@ hdfs dfs -rm -r -f ${cloudingDir}
 hadoop jar h2o-hadoop-*/h2o-${hadoopVersion}-assembly/build/libs/h2odriver.jar \
     -jobname ${jobName} -ea \
     -clouding_method filesystem -clouding_dir ${cloudingDir} \
-    -n ${nodes} -mapperXmx ${xmx} -baseport 54445 -timeout 360 \
+    -n ${nodes} -mapperXmx ${xmx} -baseport 54445 -timeout 720 \
     ${contextPathArgs} ${loginArgs} ${xgbArgs} \
     ${autoRecoveryArgs} ${disownArgs} \
     -notify ${notifyFile} ${proxyArgs} \
     > ${driverLogFile} 2>&1 &
-for i in $(seq 36); do
+for i in $(seq 30); do
   if [ -f "${notifyFile}" ]; then
     echo "H2O started on $(cat ${notifyFile})"
     break
   fi
   echo "Waiting for H2O to come up ($i)..."
-  sleep 10
+  sleep 20
 done
 if [ ! -f "${notifyFile}" ]; then
   echo 'H2O failed to start!'

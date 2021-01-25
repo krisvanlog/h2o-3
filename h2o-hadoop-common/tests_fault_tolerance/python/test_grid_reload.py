@@ -13,9 +13,9 @@ import unittest
 
 class GridReloadTest(unittest.TestCase):
 
-    def test_frame_reload(self):
-        name_node = pyunit_utils.hadoop_namenode()
-        work_dir = "hdfs://%s%s" % (name_node, utils.get_workdir())
+    def test_grid_reload(self):
+        name_node = utils.hadoop_namenode()
+        work_dir = utils.get_workdir()
         dataset = "/datasets/iris_wheader.csv"
 
         ntrees_opts = [100, 120, 130, 140]

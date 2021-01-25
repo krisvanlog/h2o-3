@@ -3,8 +3,13 @@ import subprocess
 from subprocess import PIPE, STDOUT, CalledProcessError
 
 
+def hadoop_namenode():
+    return os.getenv("NAME_NODE")
+
+
 def get_workdir():
-    return os.getenv("HDFS_WORKSPACE")
+    workspace = os.getenv("HDFS_WORKSPACE")
+    return "hdfs://%s%s" % (hadoop_namenode(), workspace)
 
 
 def get_script_path(env_var):
