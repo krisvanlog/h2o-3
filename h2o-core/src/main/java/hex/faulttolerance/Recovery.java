@@ -13,7 +13,6 @@ import water.fvec.persist.FramePersist;
 import water.fvec.persist.PersistUtils;
 import water.util.FileUtils;
 import water.util.IcedHashMap;
-import water.util.Log;
 
 import java.io.IOException;
 import java.net.URI;
@@ -35,7 +34,12 @@ public class Recovery<T extends Keyed> {
             LOG.debug("Auto recovery dir not configured.");
         } else {
             LOG.info("Initializing auto recovery from " + autoRecoveryDir);
-            new Recovery(autoRecoveryDir).autoRecover();
+            H2O.submitTask(new LocalMR(new MrFun() {
+                @Override
+                protected void map(int id) {
+                    new Recovery(autoRecoveryDir).autoRecover();
+                }
+            }, 1));
         }
     }
 
