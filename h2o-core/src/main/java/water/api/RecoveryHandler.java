@@ -5,12 +5,13 @@ import water.H2O;
 import water.Iced;
 import water.api.schemas3.SchemaV3;
 
+import static water.api.API.Direction.INPUT;
+
 public class RecoveryHandler extends Handler {
     
     public static class ResumeV3 extends SchemaV3<Iced, ResumeV3> {
 
-        @API(help = "Full path to the directory with recovery data",
-            required = true, direction = API.Direction.INPUT)
+        @API(help = "Full path to the directory with recovery data", direction = INPUT)
         public String recovery_dir;
 
     }
