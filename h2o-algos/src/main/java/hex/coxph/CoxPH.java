@@ -662,8 +662,11 @@ public class CoxPH extends ModelBuilder<CoxPHModel,CoxPHModel.CoxPHParameters,Co
           Log.info("CoxPH Last Iteration: " + iterTimer.toString());
 
         }
-       
-        if (!_parms._skip_scoring) {
+        
+        final boolean _skip_scoring = Boolean.parseBoolean(
+                System.getProperty("sys.ai.h2o.debug.checkRunLocal", Boolean.FALSE.toString())); 
+        
+        if (!_skip_scoring) {
           model.score(_parms.train()).delete();
           model._output._training_metrics = ModelMetrics.getFromDKV(model, _parms.train());
         }
