@@ -61,7 +61,7 @@ class GridAutoRecoveryTest(unittest.TestCase):
 
         cluster_1_name = "grid-auto-1-py"
         try:
-            cluster_1 = utils.start_cluster(cluster_1_name, enable_auto_recovery=True)
+            cluster_1 = utils.start_cluster(cluster_1_name, enable_auto_recovery=True, clean_auto_recovery=True)
             print("initial cluster started at %s" % cluster_1)
             h2o.connect(url=cluster_1)
             train = h2o.import_file(path="hdfs://%s%s" % (name_node, dataset))

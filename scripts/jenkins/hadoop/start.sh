@@ -45,8 +45,12 @@ while (( "$#" )); do
       shift 2
       ;;
     --auto-recovery-dir)
-      autoRecoveryArgs="-auto_recovery_dir $2"
+      autoRecoveryDir=$2
       shift 2
+      ;;
+    --auto-recovery-cleanup)
+      autoRecoveryCleanup=yes
+      shift
       ;;
     --use-external-xgb)
       useExternalXGBoost=yes
@@ -83,6 +87,12 @@ if [ "${proxy}" = "yes" ]; then
 fi
 if [ "${disown}" = "yes" ]; then 
   disownArgs="-disown"
+fi
+if [ "${autoRecoveryDir}" != "" ]; then
+  if [ "${autoRecoveryCleanup}" = "yes" ]; then
+    hdfs dfs -rm -r -f ${autoRecoveryDir}
+  fi
+  autoRecoveryArgs="-auto_recovery_dir ${autoRecoveryDir}"
 fi
 
 rm -fv ${notifyFile} ${driverLogFile}

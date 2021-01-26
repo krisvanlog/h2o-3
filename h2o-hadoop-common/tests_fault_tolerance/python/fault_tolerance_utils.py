@@ -16,7 +16,7 @@ def get_script_path(env_var):
     return os.getenv("H2O_HOME") + "/" + os.getenv(env_var)
 
 
-def start_cluster(name, enable_auto_recovery=False):
+def start_cluster(name, enable_auto_recovery=False, clean_auto_recovery=False):
     script = get_script_path("H2O_START_SCRIPT")
     notify_file = "notify_" + name
     driver_log_file = "driver_" + name + ".log"
@@ -36,6 +36,8 @@ def start_cluster(name, enable_auto_recovery=False):
         recovery_dir = get_workdir() + "_recovery"
         args.append("--auto-recovery-dir")
         args.append(recovery_dir)
+        if clean_auto_recovery:
+            args.append("--auto-recovery-cleanup")
         args.append("--proxy")
     else:
         args.append("--disown")
