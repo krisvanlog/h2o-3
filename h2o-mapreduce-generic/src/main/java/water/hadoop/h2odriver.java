@@ -707,6 +707,7 @@ public class h2odriver extends Configured implements Tool {
       conf.set(h2omapper.H2O_CLOUDING_IMPL, NetworkBasedClouding.class.getName());
       conf.set(h2omapper.H2O_DRIVER_IP_KEY, driverCallbackPublicIp);
       conf.set(h2omapper.H2O_DRIVER_PORT_KEY, Integer.toString(_ss.getLocalPort()));
+      conf.setInt(h2omapper.H2O_CLOUD_SIZE_KEY, targetCloudSize());
     } 
 
     @Override

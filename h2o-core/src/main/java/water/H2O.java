@@ -938,8 +938,9 @@ final public class H2O {
         H2O.exit(-1);
       }
     }
-    if (embeddedH2OConfig == null) { return; }
-    embeddedH2OConfig.notifyAboutCloudSize(ip, port, leaderIp, leaderPort, size);
+    if (embeddedH2OConfig != null) {
+      embeddedH2OConfig.notifyAboutCloudSize(ip, port, leaderIp, leaderPort, size);
+    }
   }
 
 
@@ -2347,13 +2348,6 @@ final public class H2O {
     Log.debug("    Start network services: " + (time10 - time9) + "ms");
     Log.debug("    Cloud up: " + (time11 - time10) + "ms");
     Log.debug("    Start GA: " + (time12 - time11) + "ms");
-    
-    if (H2O.isFlatfileEnabled()) {
-      Recovery.autoRecover(H2O.ARGS.auto_recovery_dir);
-    } else if (H2O.ARGS.auto_recovery_dir != null) {
-      Log.info("Cluster is not flat-file enabled and will not perform auto-recovery. " + 
-          "Use h2o.resume() if you wish to resume unfinished work from " + H2O.ARGS.auto_recovery_dir);
-    }
   }
 
   private static boolean isGCLoggingEnabled() {
