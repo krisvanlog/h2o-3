@@ -71,7 +71,9 @@ public abstract class AbstractEmbeddedH2OConfig {
    * Must be called by subclass when clouding is finished.
    */
   protected final void cloudingFinished() {
-    Recovery.autoRecover(H2O.ARGS.auto_recovery_dir);
+    if (H2O.SELF.isLeaderNode()) {
+      Recovery.autoRecover(H2O.ARGS.auto_recovery_dir);
+    }
   }
 
   /**
