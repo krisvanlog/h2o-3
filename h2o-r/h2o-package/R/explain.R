@@ -1499,8 +1499,8 @@ h2o.shap_explain_row_plot <-
 #' @param object An H2OAutoML object or list of H2O models.
 #' @param top_n Integer specifying the number models shown in the heatmap 
 #'              (based on leaderboard ranking). Defaults to 20.
-#'
-#' @return A ggplot2 object.
+#' @param plot If TRUE, return ggplot2 object, if FALSE return a data.frame with the variable importance.
+#' @return A ggplot2 object or data.frame containing variable importance, depending on plot parameter.
 #' @examples
 #'\dontrun{
 #' library(h2o)
@@ -1530,7 +1530,8 @@ h2o.shap_explain_row_plot <-
 #' }
 #' @export
 h2o.varimp_heatmap <- function(object,
-                               top_n = 20) {
+                               top_n = 20,
+                               plot = TRUE) {
   # Used by tidy evaluation in ggplot2, since rlang is not required #' @importFrom rlang hack can't be used
   .data <- NULL
   models_info <- .process_models_or_automl(object, NULL,
@@ -1552,6 +1553,8 @@ h2o.varimp_heatmap <- function(object,
     y_ordered <- y_ordered[stats::hclust(stats::dist(t(results)))$order]
   }
   results[["model_id"]] <- row.names(results)
+  if (!plot) return(results)
+
   results <- stats::reshape(results,
                             direction = "long",
                             varying = Filter(function(col) col != "model_id", names(results)),
@@ -1600,8 +1603,8 @@ h2o.varimp_heatmap <- function(object,
 #'              AutoML object, and based on the leaderboard ranking.  Defaults to 20.
 #' @param cluster_models Logical.  Order models based on their similarity.  Defaults to TRUE.
 #' @param triangular Print just the lower triangular part of correlation matrix.  Defaults to TRUE.
-#'
-#' @return A ggplot2 object.
+#' @param plot If TRUE, return ggplot2 object, if FALSE return a data.frame with the model correlation.
+#' @return A ggplot2 object or data.frame containing variable importance, depending on plot parameter.
 #' @examples
 #'\dontrun{
 #' library(h2o)
@@ -1631,7 +1634,7 @@ h2o.varimp_heatmap <- function(object,
 #' }
 #' @export
 h2o.model_correlation_heatmap <- function(object, newdata, top_n = 20,
-                                          cluster_models = TRUE, triangular = TRUE) {
+                                          cluster_models = TRUE, triangular = TRUE, plot = TRUE) {
   # Used by tidy evaluation in ggplot2, since rlang is not required #' @importFrom rlang hack can't be used
   .data <- NULL
   models_info <- .process_models_or_automl(object, newdata, require_multiple_models = TRUE, top_n_from_AutoML = top_n)
@@ -1667,6 +1670,7 @@ h2o.model_correlation_heatmap <- function(object, newdata, top_n = 20,
     ordered <- names(res)[stats::hclust(stats::dist(replace(res, is.na(res), 0)))$order]
   }
   res <- res[ordered, ordered]
+  if (!plot) return(res)
   varying <- row.names(res)
   if (triangular) {
     res[lower.tri(res)] <- NA
