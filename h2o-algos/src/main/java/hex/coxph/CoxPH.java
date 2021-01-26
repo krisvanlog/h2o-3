@@ -663,9 +663,10 @@ public class CoxPH extends ModelBuilder<CoxPHModel,CoxPHModel.CoxPHParameters,Co
         }
         
         final boolean _skip_scoring = Boolean.parseBoolean(
-                System.getProperty("sys.ai.h2o.debug.checkRunLocal", Boolean.FALSE.toString())); 
+                System.getProperty("sys.ai.h2o.debug.skipScoring", Boolean.FALSE.toString())); 
         
         if (!_skip_scoring) {
+          model.update();
           model.score(_parms.train()).delete();
           model._output._training_metrics = ModelMetrics.getFromDKV(model, _parms.train());
         }
